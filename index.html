@@ -242,6 +242,26 @@
                 };
             });
         }
+                //Função que sincroniza os dados com o banco quando há conexão
+                function syncData() {
+                    const transaction = db.transaction(["samples"], "readonly");
+                    const objectStore = transaction.objectStore("samples");
+                    const request = objectStore.getAll();
+                
+                    request.onsuccess = (event) => {
+                        const data = event.target.result;
+                        fetch("http://localhost:3000/sync", {
+                            method: "POST",
+                            headers: {
+                                "Content-Type": "application/json"
+                            },
+                            body: JSON.stringify(data)
+                        })
+                        .then(response => response.text())
+                        .then(result => console.log(result))
+                        .catch(error => console.error("Erro ao sincronizar dados:", error));
+                    };
+}
     </script>
 </body>
 </html>
